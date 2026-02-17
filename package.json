@@ -1,5 +1,7 @@
 {
+  "main": "dist/index.js",
   "scripts": {
+    "build": "tsc",
     "dev:test": "ts-node src/devTest.ts"
   },
   "dependencies": {
