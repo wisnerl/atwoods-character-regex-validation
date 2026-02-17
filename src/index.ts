@@ -1,62 +1,51 @@
-import { registerTool } from "@optimizely-opal/opal-tools-sdk";
-import { z } from "zod/v4";
+import express from "express";
 
-// Tool to validate and normalize SEO title & description lengths
-export const normalizeSeoMeta = registerTool(
-  "normalizeSeoMeta",
-  {
-    description:
-      "Validate and trim an SEO title (<=60 chars) and description (<=160 chars), cutting the description at the last period when needed.",
-    inputSchema: {
-      title: z.string().describe("Proposed SEO title."),
-      description: z.string().describe(
-        "Proposed SEO meta description generated from page content."
-      ),
-    },
-  },
-  async ({ title, description }) => {
-    const MAX_TITLE = 60;
-    const MAX_DESCRIPTION = 160;
+const app = express();
+app.use(express.json());
 
-    // Regex-based length validation
-    const titleRegex = new RegExp(`^.{0,${MAX_TITLE}}$`, "s");
-    const descriptionRegex = new RegExp(`^.{0,${MAX_DESCRIPTION}}$`, "s");
+const MAX_TITLE = 60;
+const MAX_DESCRIPTION = 160;
 
-    let normalizedTitle = title;
-    if (!titleRegex.test(title)) {
-      // Simple hard cutoff for title; no sentence logic needed
-      normalizedTitle = title.slice(0, MAX_TITLE).trim();
-    }
-
-    let normalizedDescription = description;
-    if (!descriptionRegex.test(description)) {
-      normalizedDescription = truncateAtLastPeriod(description, MAX_DESCRIPTION);
-
-      // Fallback to hard cutoff if still too long
-      if (!descriptionRegex.test(normalizedDescription)) {
-        normalizedDescription = normalizedDescription
-          .slice(0, MAX_DESCRIPTION)
-          .trim();
+// Discovery endpoint
+app.get("/.well-known/opal-tools.json", (req, res) => {
+  res.json({
+    tools: [
+      {
+        name: "normalizeSeoMeta",
+        description:
+          "Validate and trim an SEO title (<=60 chars) and description (<=160 chars).",
+        input_schema: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            description: { type: "string" }
+          },
+          required: ["title", "description"]
+        }
       }
-    }
+    ]
+  });
+});
 
-    return {
-      title: normalizedTitle,
-      description: normalizedDescription,
-    };
-  }
-);
+// Tool execution endpoint
+app.post("/tools/normalizeSeoMeta", (req, res) => {
+  const { title, description } = req.body;
 
-function truncateAtLastPeriod(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
+  const normalizedTitle = title.slice(0, MAX_TITLE).trim();
+  const normalizedDescription = description.slice(0, MAX_DESCRIPTION).trim();
 
-  const truncated = text.slice(0, maxLength);
-  const lastPeriodIndex = truncated.lastIndexOf(".");
+  res.json({
+    title: normalizedTitle,
+    description: normalizedDescription
+  });
+});
 
-  if (lastPeriodIndex > 0) {
-    return truncated.slice(0, lastPeriodIndex + 1).trim();
-  }
+// Health check (optional but helpful)
+app.get("/", (req, res) => {
+  res.json({ status: "SEO tool server running" });
+});
 
-  // If there's no period before the limit, just hard-cut
-  return truncated.trim();
-}
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
