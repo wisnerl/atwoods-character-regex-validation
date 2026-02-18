@@ -1,51 +1,22 @@
 import express from "express";
+import cors from "cors";
+import metaValidateRoute from "./routes/metaValidate";
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
 app.use(express.json());
 
-const MAX_TITLE = 60;
-const MAX_DESCRIPTION = 160;
-
-// Discovery endpoint
-app.get("/.well-known/opal-tools.json", (req, res) => {
+app.get("/", (_, res) => {
   res.json({
-    tools: [
-      {
-        name: "normalizeSeoMeta",
-        description:
-          "Validate and trim an SEO title (<=60 chars) and description (<=160 chars).",
-        input_schema: {
-          type: "object",
-          properties: {
-            title: { type: "string" },
-            description: { type: "string" }
-          },
-          required: ["title", "description"]
-        }
-      }
-    ]
+    service: "Meta Title & Description Compliance Tool",
+    status: "running"
   });
 });
 
-// Tool execution endpoint
-app.post("/tools/normalizeSeoMeta", (req, res) => {
-  const { title, description } = req.body;
+app.use("/meta-validate", metaValidateRoute);
 
-  const normalizedTitle = title.slice(0, MAX_TITLE).trim();
-  const normalizedDescription = description.slice(0, MAX_DESCRIPTION).trim();
-
-  res.json({
-    title: normalizedTitle,
-    description: normalizedDescription
-  });
-});
-
-// Health check (optional but helpful)
-app.get("/", (req, res) => {
-  res.json({ status: "SEO tool server running" });
-});
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Meta Compliance Tool running on port ${PORT}`);
 });

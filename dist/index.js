@@ -4,44 +4,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+const metaValidate_1 = __importDefault(require("./routes/metaValidate"));
 const app = (0, express_1.default)();
+const PORT = process.env.PORT || 3000;
+app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-const MAX_TITLE = 60;
-const MAX_DESCRIPTION = 160;
-// Discovery endpoint
-app.get("/.well-known/opal-tools.json", (req, res) => {
+app.get("/", (_, res) => {
     res.json({
-        tools: [
-            {
-                name: "normalizeSeoMeta",
-                description: "Validate and trim an SEO title (<=60 chars) and description (<=160 chars).",
-                input_schema: {
-                    type: "object",
-                    properties: {
-                        title: { type: "string" },
-                        description: { type: "string" }
-                    },
-                    required: ["title", "description"]
-                }
-            }
-        ]
+        service: "Meta Title & Description Compliance Tool",
+        status: "running"
     });
 });
-// Tool execution endpoint
-app.post("/tools/normalizeSeoMeta", (req, res) => {
-    const { title, description } = req.body;
-    const normalizedTitle = title.slice(0, MAX_TITLE).trim();
-    const normalizedDescription = description.slice(0, MAX_DESCRIPTION).trim();
-    res.json({
-        title: normalizedTitle,
-        description: normalizedDescription
-    });
-});
-// Health check (optional but helpful)
-app.get("/", (req, res) => {
-    res.json({ status: "SEO tool server running" });
-});
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+app.use("/meta-validate", metaValidate_1.default);
+app.listen(PORT, () => {
+    console.log(`Meta Compliance Tool running on port ${PORT}`);
 });
