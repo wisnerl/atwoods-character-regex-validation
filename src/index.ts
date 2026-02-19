@@ -1,5 +1,5 @@
 import express from "express";
-import { ToolsService, tool, ParameterType } from '@optimizely-opal/opal-tools-sdk';
+import { ToolsService, tool } from '@optimizely-opal/opal-tools-sdk';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,6 +8,11 @@ const DESCRIPTION_LIMIT = 160;
 app.use(express.json());
 
 const toolsService = new ToolsService(app);
+
+interface MetaInput {
+  title: string;
+  description: string;
+}
 
 tool({
   name: "Meta Title & Description Compliance Tool",
@@ -41,9 +46,9 @@ function smartTrim(text: string, limit: number): { value: string; modified: bool
   return { value: truncated.trim(), modified: true };
 }
 
-function processMeta(title: string, description: string) {
-  const processedTitle = smartTrim(title, TITLE_LIMIT);
-  const processedDescription = smartTrim(description, DESCRIPTION_LIMIT);
+function processMeta(parameters: MetaInput) {
+  const processedTitle = smartTrim(parameters.title, TITLE_LIMIT);
+  const processedDescription = smartTrim(parameters.description, DESCRIPTION_LIMIT);
 
   const titleLength = processedTitle.value.length;
   const descriptionLength = processedDescription.value.length;
