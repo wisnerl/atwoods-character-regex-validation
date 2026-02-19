@@ -1,50 +1,19 @@
 import express from "express";
-import cors from "cors";
 import metaValidateRoute from "./routes/metaValidate";
+import { ToolsService, tool, ParameterType } from '@optimizely-opal/opal-tools-sdk';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-app.use(cors());
 app.use(express.json());
 
-app.get("/", (_, res) => {
-  res.json({
-    service: "Meta Title & Description Compliance Tool",
-    status: "running"
-  });
-});
+const toolsService = new ToolsService(app);
 
-app.use("/meta-validate", metaValidateRoute);
-
-app.get("/discovery", (_req, res) => {
-  res.json({
-    functions: [
-      {
-        name: "meta_validate",
-        description:
-          "Validate and normalize an SEO title (<=60 chars) and description (<=160 chars), trimming description at the last period.",
-        endpoint: "/meta-validate",
-        http_method: "POST",
-        parameters: [
-          {
-            name: "title",
-            description: "Proposed SEO title.",
-            required: true,
-            type: "string",
-          },
-          {
-            name: "description",
-            description: "Proposed SEO meta description.",
-            required: true,
-            type: "string",
-          },
-        ],
-      },
-    ],
-  });
-});
+tool({
+  name: "Meta Title & Description Compliance Tool",
+  description: "Checks if meta titles and descriptions comply with SEO best practices.",
+})(metaValidateRoute);
 
 app.listen(PORT, () => {
-  console.log(`Meta Compliance Tool running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Discovery endpoint: http://localhost:${PORT}/discovery`);
 });

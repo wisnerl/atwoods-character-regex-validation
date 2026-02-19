@@ -9,6 +9,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@optimizely-opal/opal-tools-sdk": "^0.1.6-dev",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "zod": "^3.22.4"
