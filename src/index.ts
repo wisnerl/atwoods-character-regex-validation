@@ -14,11 +14,6 @@ interface MetaInput {
   description: string;
 }
 
-tool({
-  name: "Meta Title & Description Compliance Tool",
-  description: "Checks if meta titles and descriptions comply with SEO best practices.",
-})(processMeta);
-
 function smartTrim(text: string, limit: number): { value: string; modified: boolean } {
   if (text.length <= limit) {
     return { value: text, modified: false };
@@ -46,7 +41,7 @@ function smartTrim(text: string, limit: number): { value: string; modified: bool
   return { value: truncated.trim(), modified: true };
 }
 
-function processMeta(parameters: MetaInput) {
+export function processMeta(parameters: MetaInput) {
   const processedTitle = smartTrim(parameters.title, TITLE_LIMIT);
   const processedDescription = smartTrim(parameters.description, DESCRIPTION_LIMIT);
 
@@ -68,6 +63,11 @@ function processMeta(parameters: MetaInput) {
 
   return result;
 }
+
+tool({
+  name: "Meta Title & Description Compliance Tool",
+  description: "Checks if meta titles and descriptions comply with SEO best practices.",
+})(processMeta);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
