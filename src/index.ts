@@ -61,7 +61,6 @@ function processMeta(parameters: MetaInput) {
     console.warn("Meta compliance issues detected:");
   }
 
-  //structure as a JSON object for better readability and potential future extensions
   let result = {
     title: processedTitle.value,
     description: processedDescription.value,
