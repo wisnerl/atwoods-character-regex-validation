@@ -1,6 +1,4 @@
 import express from "express";
-import { Router } from "express";
-import { z } from "zod";
 import { ToolsService, tool } from '@optimizely-opal/opal-tools-sdk';
 
 const app = express();
@@ -20,31 +18,6 @@ tool({
   name: "Meta Title & Description Compliance Tool",
   description: "Checks if meta titles and descriptions comply with SEO best practices.",
 })(processMeta);
-
-const router = Router();
-
-const metaSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().min(1)
-});
-
-router.post("/", (req, res) => {
-  const parsed = metaSchema.safeParse(req.body);
-
-  if (!parsed.success) {
-    return res.status(400).json({
-      error: "Invalid request",
-      details: parsed.error.format()
-    });
-  }
-
-  const result = processMeta({
-    title: parsed.data.title,
-    description: parsed.data.description
-  });
-
-  res.json(result);
-});
 
 function smartTrim(text: string, limit: number): { value: string; modified: boolean } {
   if (text.length <= limit) {
@@ -84,15 +57,17 @@ function processMeta(parameters: MetaInput) {
     titleLength <= TITLE_LIMIT &&
     descriptionLength <= DESCRIPTION_LIMIT;
 
-  return {
+  if (!isCompliant) {
+    console.warn("Meta compliance issues detected:");
+  }
+
+  //structure as a JSON object for better readability and potential future extensions
+  let result = {
     title: processedTitle.value,
     description: processedDescription.value,
-    titleLength,
-    descriptionLength,
-    titleModified: processedTitle.modified,
-    descriptionModified: processedDescription.modified,
-    isCompliant
-  };
+  }
+
+  return result;
 }
 
 app.listen(PORT, () => {
