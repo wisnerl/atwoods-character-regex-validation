@@ -65,7 +65,7 @@ export function processMeta(parameters: MetaInput) {
 }
 
 tool({
-  name: "Meta Title & Description Compliance Tool",
+  name: "atwoods_meta_compliance_checker",
   description: "Checks if meta titles and descriptions comply with SEO best practices.",
 })(processMeta);
 
