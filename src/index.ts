@@ -1,5 +1,5 @@
 import express from "express";
-import { ToolsService, tool } from '@optimizely-opal/opal-tools-sdk';
+import { ToolsService, tool, ParameterType } from "@optimizely-opal/opal-tools-sdk";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -71,6 +71,20 @@ export function processMeta(parameters: MetaInput) {
 tool({
   name: "atwoods_meta_compliance_checker",
   description: "Checks if meta titles and descriptions comply with SEO best practices.",
+  parameters: [
+    {
+      name: "title",
+      type: ParameterType.String,
+      description: "Meta title (max ~60 chars)",
+      required: true,
+    },
+    {
+      name: "description",
+      type: ParameterType.String,
+      description: "Meta description (max ~160 chars)",
+      required: true,
+    },
+  ],
 })(processMeta);
 
 app.listen(PORT, () => {
