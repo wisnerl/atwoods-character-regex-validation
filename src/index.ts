@@ -45,8 +45,8 @@ export function processMeta(parameters: MetaInput) {
   const processedTitle = smartTrim(parameters.title, TITLE_LIMIT);
   const processedDescription = smartTrim(parameters.description, DESCRIPTION_LIMIT);
 
-  const titleLength = processedTitle.value.length;
-  const descriptionLength = processedDescription.value.length;
+  const titleLength = processedTitle.value?.length;
+  const descriptionLength = processedDescription.value?.length;
 
   const isCompliant =
     titleLength <= TITLE_LIMIT &&
