@@ -44,8 +44,8 @@ function smartTrim(text: string, limit: number): { value: string; modified: bool
 export function processMeta(parameters: MetaInput) {
   const processedTitle = smartTrim(parameters.title, TITLE_LIMIT);
   const processedDescription = smartTrim(parameters.description, DESCRIPTION_LIMIT);
-  console.log(`Old Title: "${parameters.title}" (${parameters.title.length} chars)`);
-  console.log(`Old Description: "${parameters.description}" (${parameters.description.length} chars)`);
+  console.log(`Old Title: "${parameters.title}" (${parameters.title?.length} chars)`);
+  console.log(`Old Description: "${parameters.description}" (${parameters.description?.length} chars)`);
   console.log(`Processed Title: "${processedTitle.value}" (${processedTitle.value?.length} chars)`);
   console.log(`Processed Description: "${processedDescription.value}" (${processedDescription.value?.length} chars)`);
 
